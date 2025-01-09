@@ -1,3 +1,5 @@
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from radish import *
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -11,11 +13,16 @@ import os
 from selenium.webdriver.common.by import By
 
 
+u_name="//div/br[1]"
+input="//input[@placeholder='{}']"
+submit="//input[@type='submit']"
+itemxpath="//div[normalize-space()='{}']/../../../div[2]//button//"
+cart="//a[@class='shopping_cart_link']"
 
 def brow_lun(context):
     context.browser = webdriver.Chrome
 
-@given('I launch and open the browser chrome')
+@given('User launch and open the browser chrome')
 def launchandopenbrowser(step):
     # if(browser=='chrome'):
     #     step.context.driver=webdriver.Chrome()
@@ -24,7 +31,7 @@ def launchandopenbrowser(step):
     #     step.context.driver=webdriver.Firefox(options=options)
 
     # elif(browser=='edge'):
-    step.context.driver=webdriver.Edge()
+    step.context.driver=webdriver.Chrome()
 
     step.context.driver.maximize_window()
     #step.context.driver.close()
@@ -39,14 +46,39 @@ def launchandopenbrowser2(step):
     #
     # elif(browser=='edge'):
     #     step.context.driver=webdriver.Edge()
-    step.context.driver.get("https://google.com")
+    # step.context.driver.get("https://google.com")
     step.context.driver.maximize_window()
-@when('launch the url')
+@when('User launch the url')
 def launchurl(step):
-    step.context.driver.get("https://en-gb.facebook.com/reg")
+    step.context.driver.get("https://www.saucedemo.com/")
     time.sleep(5)
 
+@when('User providing username and password')
+def provideunamepwd(step):
+    try:
+        # (WebDriverWait(step.context.driver, 10).until
+        #  (EC.presence_of_element_located(step.context.driver.find_element(By.XPATH, input.format("Username")).send_keys("standard_user"))))
+        #
+        # (WebDriverWait(step.context.driver, 10).until
+        #  (EC.presence_of_element_located(step.context.driver.find_element(By.XPATH, input.format("Password")).send_keys("secret_sauce"))))
+        step.context.driver.find_element(By.XPATH, input.format("Username")).send_keys("standard_user")
+        step.context.driver.find_element(By.XPATH, input.format("Password")).send_keys("secret_sauce")
+        step.context.driver.find_element(By.XPATH, submit).click()
 
+        time.sleep(10)
+    except Exception as e:
+        print(e)
+        # step.context.driver.get_screenshot_as_base64
+@when('User select {item} and clicking add to cart button')
+def selectItem(step,item):
+    try:
+        (WebDriverWait(step.context.driver, 10).until
+         (EC.presence_of_element_located(step.context.driver.find_element(By.XPATH, itemxpath.format(item)).click())))
+
+        time.sleep(5)
+    except Exception as e:
+        print(e)
+        step.embed(step.context.driver.get_screenshot_as_base64(),mime_type='image/png',encode_data_to_base64=False)
 @then('enter the new user detail')
 def new_user(step):
 
